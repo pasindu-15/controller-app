@@ -1,0 +1,14 @@
+
+server:
+  port: 8082
+
+aws:
+  region: "ap-northeast-1"
+  ec2:
+    auto-scaling-group:
+      name : 'Infra-ECS-Cluster-my-demo-cluster-2-82e20c10-ECSAutoScalingGroup-WURgVGNttEfx'
+
+
+matrix:
+  export:
+    file-path: "metrics.csv"
