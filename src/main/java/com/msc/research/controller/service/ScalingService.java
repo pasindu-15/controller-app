@@ -8,8 +8,7 @@ import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.cloudwatch.model.Datapoint;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ScalingService {
@@ -29,29 +28,53 @@ public class ScalingService {
 
     public void readAndScale() {
 
-//        long duration = 150;
-//        Map<Instant, List<Datapoint>> sortedDpMap = metricReader.readMetrics(duration, true);
-//
-//        Map.Entry<Instant,List<Datapoint>> recentData = null;
-//        for (Map.Entry<Instant,List<Datapoint>> entry : sortedDpMap.entrySet()) {
+        long duration = 200;
+        double desiredInsCount;
+        TreeMap<Instant, List<Datapoint>> sortedDpMap = metricReader.readMetrics(duration, true);
+
+
+        List<Datapoint> recentData =  null;
+//        for (TreeMap<Instant,List<Datapoint>> entry : sortedDpMap.) {
 //            recentData = entry;
 //        }
-        //TODO: predict the CPU
-        prediction.predictCPU();
-        double cpuPred = prediction.predictCPU();;
 
-        double desiredInsCount = Math.ceil(cpuPred/0.2);  // 0.5 cpu x 40% threshold
+        for( int i = sortedDpMap.size()-1 ; i >=0; i-- ){
 
-//        double existingInsCount = recentData.getValue().get(4).maximum();
+            recentData = sortedDpMap.lastEntry().getValue();
 
-//        if(desiredInsCount != existingInsCount){
-//            //TODO: execute the scaling action with insCount
-////            ecsService.adjustTaskCount(clusterName,serviceName, (int)desiredInsCount);
-//            ecsService.adjustTaskCount(clusterName,serviceName, 2);
-//
-//        }
-        System.out.println();
+            if(sortedDpMap.lastEntry().getValue().size() != 5){
+                sortedDpMap.remove(sortedDpMap.lastKey());
+                continue;
+            }else{
 
+                break;
+            }
+        }
+        if(recentData.size() != 5){
+            desiredInsCount = 1;
+        }else{
+            double cpuPred = prediction.predictCPU(recentData);
+            System.out.println(recentData.get(0).timestamp() +": predicted CPU :"+ cpuPred);
+
+            desiredInsCount = Math.ceil(cpuPred/0.2);  // 0.5 cpu x 40% threshold
+
+        }
+
+        double existingInsCount = 0;
+        for(Datapoint dp : recentData){
+            if(Objects.nonNull(dp.maximum())){
+                existingInsCount = dp.maximum();
+            }
+        }
+
+        if(desiredInsCount != existingInsCount){
+//            //execute the scaling action with insCount
+
+            ecsService.adjustTaskCount(clusterName,serviceName, (int)desiredInsCount);
+            System.out.println("desired instant count :"+desiredInsCount);
+
+
+        }
 
     }
 }

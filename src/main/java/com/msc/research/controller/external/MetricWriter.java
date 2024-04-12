@@ -31,7 +31,6 @@ public class MetricWriter {
 
                 for (Datapoint dp : m.getValue()) {
                     if (Objects.nonNull(dp.average())) {
-
                         values.add(dp.average());
                     } else if (Objects.nonNull(dp.sum())) {
 
@@ -39,12 +38,14 @@ public class MetricWriter {
                     } else if (Objects.nonNull(dp.maximum())) {
 
                         values.add(dp.maximum());
+                    }else{
+                        values.add(0.0);
                     }
 
                 }
-                double cpuUnits = ((double)values.get(5) * (double)values.get(4))/200;
-                values.remove(4);
-                values.remove(4);
+                double cpuUnits = ((double)values.get(values.size()-1) * (double)values.get(values.size()-2))/200;
+                values.remove(values.size()-1);
+                values.remove(values.size()-1);
                 values.add(cpuUnits);
 
                 String line = String.join(", ", values.toString());
@@ -53,7 +54,8 @@ public class MetricWriter {
             }
 
             System.out.println("CSV file generated successfully: " + csvFilePath);
-        } catch (IOException e) {
+        } catch (Exception e) {
+//            return;
             e.printStackTrace();
         }
     }

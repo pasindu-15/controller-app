@@ -24,7 +24,7 @@ public class MetricReader {
     Map<Instant, MetricModel> collectedCPU;
     Map<Instant, List<Datapoint>> datapointMap;
 
-    public Map<Instant, List<Datapoint>> readMetrics(long duration, boolean isHighLevelMetricOnly) {
+    public TreeMap<Instant, List<Datapoint>> readMetrics(long duration, boolean isHighLevelMetricOnly) {
 
         collectedCPU = new HashMap<>();
         datapointMap = new HashMap<>();
@@ -43,7 +43,7 @@ public class MetricReader {
 
         Dimension elbDim = Dimension.builder()
                 .name("LoadBalancer")
-                .value("app/demo-LB-10/7c621bdf72c815ed")
+                .value("app/demo-LB-11/b50f69dc06a3a350")
                 .build();
 
         Dimension cltDim = null;
@@ -97,6 +97,12 @@ public class MetricReader {
             for (GetMetricStatisticsResponse result : results) {
                 // Process each result
                 List<Datapoint> data = result.datapoints();
+//                if(data.isEmpty()){
+//                    Datapoint.Builder newDP = Datapoint.builder();
+//                    if(Objects.equals(result.label(),"TargetResponseTime")){
+//                        newDP.average(0.0);
+//                    }
+//                }
 
                 // Create a new ArrayList from the existing list of datapoints
                 List<Datapoint> sortedDatapoints = new ArrayList<>(data);
@@ -104,28 +110,14 @@ public class MetricReader {
                 // Sort the new list of datapoints by timestamp
                 sortedDatapoints.sort(Comparator.comparing(Datapoint::timestamp));
 
-
-//                if (Objects.equals(result.label(), "RequestCount")) {
                     if (!data.isEmpty()) {
                         for (Datapoint datapoint : sortedDatapoints) {
                             addValue(datapoint.timestamp(),datapoint);
-
-//                            MetricModel mm = new MetricModel();
-//                            System.out.println("Timestamp: " + datapoint.timestamp() + " Maximum TPS value: " + datapoint.sum() / 60);
                         }
                     } else {
                         System.out.println("The returned data list is empty");
                     }
-//                } else {
-//                    if (!data.isEmpty()) {
-//                        for (Datapoint datapoint : sortedDatapoints) {
-//                            addValue(datapoint.timestamp(),datapoint);
-//                            System.out.println("Timestamp: " + datapoint.timestamp() + " Maximum value: " + datapoint.maximum());
-//                        }
-//                    } else {
-//                        System.out.println("The returned data list is empty");
-//                    }
-//                }
+
 
             }
 
@@ -147,40 +139,6 @@ public class MetricReader {
     }
 
 
-//    public void getAndDisplayMetricStatistics(CloudWatchClient cw, String nameSpace, String metVal,
-//                                                     String metricOption, Dimension ... myDimension) {
-//        try {
-//            Instant startTime = Instant.parse("2024-04-09T00:00:00Z"); // Example start time (1 hour ago)
-//            Instant endTime = Instant.parse("2024-04-09T12:00:00Z"); // Example end time (now)
-//
-//            GetMetricStatisticsRequest statisticsRequest = GetMetricStatisticsRequest.builder()
-//                    .endTime(endTime)
-//                    .startTime(startTime)
-//                    .dimensions(myDimension)
-//                    .metricName(metVal)
-//                    .namespace(nameSpace)
-//                    .period(60)
-//                    .statistics(Statistic.fromValue(metricOption))
-//                    .build();
-//
-//            GetMetricStatisticsResponse response = cw.getMetricStatistics(statisticsRequest);
-//            List<Datapoint> data = response.datapoints();
-//            if (!data.isEmpty()) {
-//                for (Datapoint datapoint : data) {
-//
-//                    System.out
-//                            .println("Timestamp: " + datapoint.timestamp() + " Maximum value: " + datapoint.maximum());
-//                }
-//            } else {
-//                System.out.println("The returned data list is empty");
-//            }
-//
-//        } catch (CloudWatchException e) {
-//            System.err.println(e.getMessage());
-//            System.exit(1);
-//        }
-//    }
-
 
     public GetMetricStatisticsRequest createMetricRequest(CloudWatchClient cw, String nameSpace, String metVal,
                                                           String metricOption, Dimension... myDimension) {
@@ -196,11 +154,28 @@ public class MetricReader {
 //        Instant startTime = Instant.parse("2024-04-11T08:33:00Z"); // Example start time (1 hour ago)
 //        Instant endTime = Instant.parse("2024-04-11T08:49:00Z"); // Example end time (now)
 
-        Instant startTime = Instant.parse("2024-04-11T10:22:00Z"); // Example start time (1 hour ago)
-        Instant endTime = Instant.parse("2024-04-11T10:59:00Z"); // Example end time (now)
+//        Instant startTime = Instant.parse("2024-04-11T10:22:00Z"); // Example start time (1 hour ago)
+//        Instant endTime = Instant.parse("2024-04-11T10:59:00Z"); // Example end time (now)
+//
+//        Instant startTime = Instant.parse("2024-04-11T15:30:00Z"); // Example start time (1 hour ago)
+//        Instant endTime = Instant.parse("2024-04-11T15:54:00Z"); // Example end time (now)
+//
+//        Instant startTime = Instant.parse("2024-04-12T06:50:00Z"); // Example start time (1 hour ago)
+//        Instant endTime = Instant.parse("2024-04-12T06:54:00Z"); // Example end time (now)
 
-//        Instant endTime = Instant.now();
-//        Instant startTime = Instant.now().minusSeconds(duration); // Start time is one minute ago
+//        Instant startTime = Instant.parse("2024-04-12T07:08:00Z"); // Example start time (1 hour ago)
+//        Instant endTime = Instant.parse("2024-04-12T07:12:00Z"); // Example end time (now)
+//
+//        Instant startTime = Instant.parse("2024-04-12T07:11:00Z"); // Example start time (1 hour ago)
+//        Instant endTime = Instant.parse("2024-04-12T07:16:00Z"); // Example end time (now)
+
+//        Instant startTime = Instant.parse("2024-04-12T07:50:00Z"); // Example start time (1 hour ago)
+//        Instant endTime = Instant.parse("2024-04-12T07:52:00Z"); // Example end time (now)
+// Instant startTime = Instant.parse("2024-04-12T07:54:00Z"); // Example start time (1 hour ago)
+//        Instant endTime = Instant.parse("2024-04-12T08:06:00Z"); // Example end time (now)
+//
+        Instant endTime = Instant.now();
+        Instant startTime = Instant.now().minusSeconds(duration); // Start time is one minute ago
 
 
         return GetMetricStatisticsRequest.builder()
@@ -243,44 +218,5 @@ public class MetricReader {
         return results;
     }
 }
-
-
-//
-//    public List<MergedType> mergeLists(List<Datapoint> listA, List<Datapoint> listB, List<Datapoint> listC) {
-//        List<MergedType> mergedList = new ArrayList<>();
-//
-//        // Convert TypeA objects to MergedType and add to mergedList
-//        for (Datapoint obj : listA) {
-//            mergedList.add(new MergedType(obj.timestamp()));
-//        }
-//
-//        // Convert TypeB objects to MergedType and add to mergedList
-//        for (Datapoint obj : listB) {
-//            mergedList.add(new MergedType(obj.timestamp()));
-//        }
-//
-//        // Convert TypeC objects to MergedType and add to mergedList
-//        for (Datapoint obj : listC) {
-//            mergedList.add(new MergedType(obj.timestamp()));
-//        }
-//
-//        return mergedList;
-//    }
-//}
-//
-//class MergedType {
-//    private Instant commonField;
-//    // Add other fields as needed
-//
-//    public MergedType(Instant commonField) {
-//        this.commonField = commonField;
-//    }
-//
-//    public Instant getCommonField() {
-//        return commonField;
-//    }
-//
-//    // Add setters and getters for other fields
-//}
 
 
